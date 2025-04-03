@@ -10,14 +10,21 @@ const MoviePage: React.FC = () => {
   const [movies, setMovies] = useState<any[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await getMovies();
-        setMovies(response.results);
+        setMovies(response.results || []);
       } catch (error) {
         console.error('Error fetching movies:', error);
+        setError('Failed to fetch movies. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,15 +47,30 @@ const MoviePage: React.FC = () => {
           <MovieSearch onMovieSelect={handleMovieSelect} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {movies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onClick={handleMovieSelect}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading movies...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-600">
+            {error}
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="text-center py-8 text-gray-600">
+            No movies found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {movies.map((movie) => (
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                onClick={handleMovieSelect}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {showDetails && selectedMovie && (

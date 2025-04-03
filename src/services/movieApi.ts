@@ -5,14 +5,15 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 
 export const getMovies = async (query: string = '') => {
   try {
-    const response = await axios.get(`${BASE_URL}/search/movie`, {
-      params: {
-        api_key: API_KEY,
-        query,
-        include_adult: false,
-        language: 'en-US',
-      },
-    });
+    const params = {
+      api_key: API_KEY,
+      language: 'en-US',
+      include_adult: false,
+      page: 1,
+      query: query,
+    };
+
+    const response = await axios.get(`${BASE_URL}/search/movie`, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching movies:', error);
@@ -22,12 +23,12 @@ export const getMovies = async (query: string = '') => {
 
 export const getMovieDetails = async (movieId: number) => {
   try {
-    const response = await axios.get(`${BASE_URL}/movie/${movieId}`, {
-      params: {
-        api_key: API_KEY,
-        language: 'en-US',
-      },
-    });
+    const params = {
+      api_key: API_KEY,
+      language: 'en-US',
+    };
+
+    const response = await axios.get(`${BASE_URL}/movie/${movieId}`, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching movie details:', error);
